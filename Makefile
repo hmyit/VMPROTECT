@@ -1,6 +1,6 @@
 PROJECTNAME = VMPROTECT
 CC = g++
-CFLAGS = -Wall -Wextra -std=c++11 -g 
+CFLAGS = -Wall -Wextra -std=c++11
 SRC_DIR = src
 OBJ_DIR = obj
 PRSOURCES = $(wildcard $(SRC_DIR)/*.cpp)

@@ -4,6 +4,10 @@ VMCPU::VMCPU()
 {
     AS = (PADDRESS_SPACE) new ADDRESS_SPACE;
     REGS = (PREGISTERSS) new REGISTERSS;
+
+    REGS->PC = 0;
+    REGS->SP = sizeof(AS->stack) / sizeof(WORD);
+    REGS->Flags = 0;
 }
 
 VMCPU::~VMCPU()
@@ -29,15 +33,22 @@ void VMCPU::run()
 
     while(!exit)
     {
+        opcode = AS->data[REGS->PC++];
         switch(opcode)
         {
             /* NOP */
             case 0x00:
             case 0x01:
+                vmPrintf("[DEBUG] NOP");
+                break;
+            /* EC - end of code */
+            case 0xEC:
+                vmPrintf("[DEBUG] EC");
+                exit = true;
                 break;
             /* MOV - move from register to register */
-            case 0x02:
-                ;
+            case 0x03:
+                exit = true;
                 break;
             default:
             EXCEPTION:

@@ -10,9 +10,9 @@ int main()
     VMCPU *vm = new VMCPU();
 
     BYTE *code = loadProtectedCode();
-    std::cout << "[DEBUG] " << unsigned(code[1]) << std::endl;
     vm->loadCode(code);
     deleteProtectedCode(code);
+    vm->run();
     delete vm;
 
     return 0;

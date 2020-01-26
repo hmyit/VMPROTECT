@@ -39,7 +39,7 @@ typedef struct {
     };
     /* Program Counter */
     WORD PC;
-    /* STACK POINTER */
+    /* Stack Pointer */
     WORD SP;
 } REGISTERSS, *PREGISTERSS;
 
