@@ -35,8 +35,12 @@ def main():
                     outFileInstIndexNumber += 6
                 outFile += "0x00, "
                 outFileInstIndexNumber += 6
+            # Check if comment
+            elif line.find("#") != -1:
+                pass
             # Check if it is reference to label
             elif line.find("@") != -1:
+                # TODO
                 pass
             else:
                 if len(line.split()) == 1:

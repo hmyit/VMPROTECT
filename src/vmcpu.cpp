@@ -5,6 +5,8 @@ VMCPU::VMCPU()
     AS = (PADDRESS_SPACE) new ADDRESS_SPACE;
     REGS = (PREGISTERSS) new REGISTERSS;
 
+    memset(AS->data, 0, sizeof(AS->data));
+
     REGS->PC = 0;
     REGS->SP = sizeof(AS->stack) / sizeof(WORD);
     REGS->Flags = 0;
@@ -16,13 +18,15 @@ VMCPU::~VMCPU()
     delete REGS;
 }
 
-bool VMCPU::loadCode(BYTE *mcode)
+bool VMCPU::loadCode(BYTE *mcode, BYTE *usrInput, int sizeUserIn)
 {
     unsigned int mcodeSize = sizeof(mcode)/sizeof(mcode[0]);
 
     if(mcodeSize > sizeof(AS->data)) 
         return false;
     memcpy(AS->data, mcode, mcodeSize);
+    REGS->R[3] = (WORD) mcodeSize;
+    memcpy(AS->data + mcodeSize, usrInput, sizeUserIn);
     return true;
 }
 
