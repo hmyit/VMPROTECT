@@ -18,8 +18,8 @@ typedef struct {
 } ADDRESS_SPACE, *PADDRESS_SPACE;
 
 typedef struct {
-    /* General Purpose Registers R0 -> R3 */
-    WORD R[4];
+    /* General Purpose Registers R0 -> R5 */
+    WORD R[6];
     union {
         unsigned char Flags;
         struct {

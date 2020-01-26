@@ -3,7 +3,15 @@ import sys
 dOPCODES = {
     "NOP":"0x00",
     "NOPV":"0x01",
-    "EC":"0xEC"
+    "EC":"0xEC",
+    "MOV":"0x02",
+    "MOVMB":"0x03",
+    "MOVMW":"0x04",
+    "MOVB":"0x05",
+    "MOVW":"0x06",
+    "MOVBM":"0x07",
+    "MOVWM":"0x08",
+    "JMP":"0x09"
 }
 
 dREGS = {
@@ -47,9 +55,10 @@ def main():
                     outFile += dOPCODES[line.split()[0]]
                     outFile += ", "
                     outFileInstIndexNumber += 6
-                elif len(line.split()) == 2:
-                    pass
                 elif len(line.split()) == 0:
+                    pass
+                elif len(line.split()) > 1:
+                    # TODO
                     pass
                 else:
                     print("[ERROR] Unknow instruction at " + str(indexNumber) + "!")

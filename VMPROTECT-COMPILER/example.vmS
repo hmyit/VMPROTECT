@@ -1,4 +1,4 @@
-# Usr input (addr) saved in R4
+# Usr input (addr) saved in R0
 NOP
 NOPV
 EC
