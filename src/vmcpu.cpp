@@ -9,7 +9,6 @@ VMCPU::VMCPU()
 
     REGS->PC = 0;
     REGS->SP = sizeof(AS->stack) / sizeof(WORD);
-    REGS->Flags = 0;
 }
 
 VMCPU::~VMCPU()
@@ -34,8 +33,8 @@ void VMCPU::run()
 {
     bool exit = false;
     BYTE opcode;
-    BYTE bTmp_0, bTmp_1, bTmp_2, bTmp_3;
-    WORD wTmp_0, wTmp_1, wTmp_2, wTmp_3;
+    BYTE bTmp_0, bTmp_1;
+    WORD wTmp_0;
 
     while(!exit)
     {
@@ -70,7 +69,7 @@ void VMCPU::run()
                 02 03 04 01 => MOVX R3,BYTE [0104]
             */
             case 0x03:
-                bTmp_0 = AS->data[REGS->PC];
+                bTmp_0 = AS->data[REGS->PC++];
                 if(bTmp_0 > 5) goto EXCEPTION;
                 wTmp_0 = *(WORD*) &AS->data[REGS->PC];
                 if(wTmp_0 >= sizeof(AS->data)) goto EXCEPTION;
@@ -83,7 +82,7 @@ void VMCPU::run()
                 04 03 04 01 => MOV R3, WORD [0104]
             */
             case 0x04:
-                bTmp_0 = AS->data[REGS->PC];
+                bTmp_0 = AS->data[REGS->PC++];
                 if(bTmp_0 > 5) goto EXCEPTION;
                 wTmp_0 = *(WORD*) &AS->data[REGS->PC];
                 if(wTmp_0 >= sizeof(AS->data)) goto EXCEPTION;
@@ -120,7 +119,7 @@ void VMCPU::run()
                 wTmp_0 = *(WORD*) &AS->data[REGS->PC];
                 if(wTmp_0 >= sizeof(AS->data)) goto EXCEPTION;
                 REGS->PC += 2;
-                AS->data[wTmp_0] = *(BYTE*) REGS->R[bTmp_0];
+                AS->data[wTmp_0] = *(BYTE*) &REGS->R[bTmp_0];
                 break;  
             /* 
                 MOVWM - move word from register to memory location 
@@ -134,16 +133,45 @@ void VMCPU::run()
                 REGS->PC += 2;
                 *(WORD*) &AS->data[wTmp_0] = REGS->R[bTmp_0];
                 break;
-            /*
-                Unconditional Jump
-                09 15 00 => JMP 0015
+            /* 
+                MOVMRB - move and extend byte from memory to register
+                        get addr from register
+                09 02 01 => MOVMRB R2, R1
             */
             case 0x09:
+                bTmp_0 = AS->data[REGS->PC++];
+                if(bTmp_0 > 5) goto EXCEPTION;
+                bTmp_1 = AS->data[REGS->PC++];
+                if(bTmp_1 > 5) goto EXCEPTION;
+                wTmp_0 = REGS->R[bTmp_1];
+                if(wTmp_0 >= sizeof(AS->data)) goto EXCEPTION;
+                REGS->R[bTmp_0] = 0;
+                *(BYTE*) &REGS->R[bTmp_0] = AS->data[wTmp_0];
+                break;
+            /* 
+                MOVMRW - move word from memory to register
+                        get addr from register
+                0A 02 01 => MOVMRW R2, R1
+            */
+            case 0x0A:
+                bTmp_0 = AS->data[REGS->PC++];
+                if(bTmp_0 > 5) goto EXCEPTION;
+                bTmp_1 = AS->data[REGS->PC++];
+                if(bTmp_1 > 5) goto EXCEPTION;
+                wTmp_0 = REGS->R[bTmp_1];
+                if(wTmp_0 >= sizeof(AS->data)) goto EXCEPTION;
+                REGS->R[bTmp_0] = *(WORD*) &AS->data[wTmp_0];
+                break;
+            /*
+                Unconditional Jump
+                0B 15 00 => JMP 0015
+            */
+            case 0x0B:
                 wTmp_0 = *(WORD*) &AS->data[REGS->PC];
                 REGS->PC += 2;
                 if(wTmp_0 > sizeof(AS->data)) goto EXCEPTION;
                 REGS->PC = wTmp_0;
-                break;  
+                break; 
             default:
             EXCEPTION:
                 vmPrintf("vCPU ERROR!");

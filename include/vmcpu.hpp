@@ -20,22 +20,17 @@ typedef struct {
 typedef struct {
     /* General Purpose Registers R0 -> R5 */
     WORD R[6];
-    union {
-        unsigned char Flags;
-        struct {
-            /* Zero Flag 
-                value 1 - flag is set
-                value 0 - flag is not set
-            */
-            unsigned char ZF : 1;
-            /* Carry Flag 
-                value 1 - flag is set
-                value 0 - flag is not set
-            */
-            unsigned char CF : 1;
-            unsigned char Unused : 6;
-
-        };
+    struct {
+        /* Zero Flag 
+            value 1 - flag is set if the result of the last comparison was zero
+            value 0 - flag is not set
+        */
+        unsigned char ZF : 1;
+        /* Carry Flag 
+            value 1 - flag is set the results of the last comparison was moving
+            value 0 - flag is not set
+        */
+        unsigned char CF : 1;
     };
     /* Program Counter */
     WORD PC;

@@ -13,7 +13,7 @@ int main()
     do {
         std::cout << "PASSWORD: ";
         std::cin >> password;
-    } while(password.size() < 2 || password.size() > 16);
+    } while(password.size() < 2 || password.size() > 26);
 
     BYTE *usrInput = new BYTE(password.size() + 1);
     memset(usrInput, 0, sizeof(usrInput)/sizeof(usrInput[0]));
