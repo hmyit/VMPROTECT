@@ -51,7 +51,7 @@ class VMCPU {
         VMCPU();
         ~VMCPU();
         void run();
-        bool loadCode(BYTE *, BYTE *, int);
+        bool loadCode(BYTE *, int, BYTE *, int);
 };
 
 #endif //_VM_CPU_HPP

@@ -22,10 +22,16 @@ int main()
     }
     usrInput[password.size()] = (BYTE) 0;
 
-    BYTE *code = loadProtectedCode();
-    vm->loadCode(code, usrInput, password.size());
+    BYTE *mc = NULL;
+    int mcsize = loadProtectedCode(&mc);
+    if(!vm->loadCode(mc, mcsize, usrInput, password.size()))
+    {
+        delete[] usrInput;
+        delete[] mc;
+        return -1;
+    }
     delete[] usrInput;
-    deleteProtectedCode(code);
+    delete[] mc;
     vm->run();
     delete vm;
 

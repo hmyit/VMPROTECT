@@ -17,15 +17,13 @@ VMCPU::~VMCPU()
     delete REGS;
 }
 
-bool VMCPU::loadCode(BYTE *mcode, BYTE *usrInput, int sizeUserIn)
+bool VMCPU::loadCode(BYTE *mcode, int mcsize, BYTE *usrInput, int sizeUserIn)
 {
-    unsigned int mcodeSize = sizeof(mcode)/sizeof(mcode[0]);
-
-    if(mcodeSize > sizeof(AS->data)) 
+    if((unsigned) mcsize > sizeof(AS->data)) 
         return false;
-    memcpy(AS->data, mcode, mcodeSize);
-    REGS->R[0] = (WORD) mcodeSize;
-    memcpy(AS->data + mcodeSize, usrInput, sizeUserIn);
+    memcpy(AS->data, mcode, mcsize);
+    REGS->R[0] = (WORD) mcsize;
+    memcpy(AS->data + mcsize, usrInput, sizeUserIn);
     return true;
 }
 
@@ -43,8 +41,10 @@ void VMCPU::run()
         {
             /* NOP */
             case 0x00:
-            case 0x01:
                 vmPrintf("[DEBUG] NOP");
+                break;
+            case 0x01:
+                vmPrintf("[DEBUG] NOPV");
                 break;
             /* EC - end of code */
             case 0xEC:
@@ -168,6 +168,7 @@ void VMCPU::run()
                 0B 15 00 => JMP 0015
             */
             case 0x0B:
+                vmPrintf("[DEBUG] JMP");
                 wTmp_0 = *(WORD*) &AS->data[REGS->PC];
                 REGS->PC += 2;
                 if(wTmp_0 > sizeof(AS->data)) goto EXCEPTION;

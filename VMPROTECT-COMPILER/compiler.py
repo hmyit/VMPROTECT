@@ -11,6 +11,8 @@ dOPCODES = {
 
     # 3 PARAM
     "MOVB":"0x05",
+    "MOVMRB":"0x09",
+    "MOVMRW":"0x0A",
 
     # 4 PARAM
     "MOVMB":"0x03",
@@ -20,7 +22,7 @@ dOPCODES = {
     "MOVWM":"0x08",
     
     # 1 PARAM
-    "JMP":"0x09"
+    "JMP":"0x0B"
 }
 
 dREGS = {
@@ -36,32 +38,26 @@ dFoundedReferenceLabels = {} # {label: str position}
 dFoundedLabels = {} # {label: code position}
 
 def changeLabelToAddr(outFile):
-    offsetAfterChangeStr = 0
-    offsetAfterChangeCode = 0
     for k in dFoundedReferenceLabels.keys():
-        tmp1 = outFile[:dFoundedReferenceLabels[k] + offsetAfterChangeStr]
-        tmp2 = outFile[dFoundedReferenceLabels[k] + offsetAfterChangeStr:]
-        val = dFoundedLabels[k] + offsetAfterChangeCode
+        tmp1 = outFile[:dFoundedReferenceLabels[k]]
+        tmp2 = outFile[dFoundedReferenceLabels[k] + 12:]
+        val = dFoundedLabels[k]
+
         if val < 10:
-            offsetAfterChangeCode += 2
-            offsetAfterChangeStr += 12
+            tmp1 += "0x0" + hex(val)[2:] + ", 0x00, "
+            outFile = tmp1 + tmp2
+        elif val < 16:
             tmp1 += "0x0" + hex(val)[2:] + ", 0x00, "
             outFile = tmp1 + tmp2
         elif val < 100:
-            offsetAfterChangeCode += 2
-            offsetAfterChangeStr += 12
-            tmp1 += hex(val)[2:] + ", 0x00, "
+            tmp1 += hex(val) + ", 0x00, "
             outFile = tmp1 + tmp2
         elif val < 1000:
-            offsetAfterChangeCode += 2
-            offsetAfterChangeStr += 12
             t1 = hex(val)[2:3]
             t2 = hex(val)[3:5]
             tmp1 += "0x" + t2 + ", 0x0" + t1 + ", "
             outFile = tmp1 + tmp2
         else:
-            offsetAfterChangeCode += 2
-            offsetAfterChangeStr += 12
             t1 = hex(val)[2:4]
             t2 = hex(val)[4:6]
             tmp1 += "0x" + t2 + ", 0x" + t1 + ", "
@@ -69,7 +65,7 @@ def changeLabelToAddr(outFile):
     return outFile
 
 def errorC():
-    print("[ERROR] Unknow instruction at " + str(indexNumber) + "!")
+    print("[ERROR] Unknow instruction!")
     print("[ERROR] Compilation failed!")
     exit()
 
@@ -77,37 +73,34 @@ def main():
     if len(sys.argv) != 2:
         print("[ERROR] Too few arguments!")
     fileNameToCompile = sys.argv[1]
-    indexNumber = 0
     outFile = ""
     outFileInstIndexNumber = 0
     outFileInstCodeOffset = 0
     with open(fileNameToCompile)  as fd:
         line = fd.readline()
-        indexNumber += 1
         while line:
-            # Check if label to data
-            if line.find("DL:") != -1:
+            # Check if comment
+            if line.find("#") != -1:
+                pass
+            # Check if DATA LABEL
+            elif line.find("DL:") != -1:
                 label = line.split(":")[0]
                 line = fd.readline()
-                indexNumber += 1
                 text = line.split(",")[0]
                 dFoundedLabels[label] = outFileInstCodeOffset
-                outFileInstCodeOffset += 1
                 for i in range(text.find("\"") + 1, len(text) - 1):
                     outFile += str(hex(ord(text[i])))
                     outFile += ", "
                     outFileInstIndexNumber += 6
+                    outFileInstCodeOffset += 1
                 outFile += "0x00, "
                 outFileInstIndexNumber += 6
-            # Check if comment
-            elif line.find("#") != -1:
-                pass
-            # Check if it is reference to label
+            # Check if it is reference to DATA LABEL
             elif line.find("DL@") != -1:
                 if len(line.split()) == 2:
                     pass
                 elif len(line.split()) == 3:
-                    outFileInstCodeOffset += 3
+                    outFileInstCodeOffset += 4
                     opc = line.split()[0]
                     p1 = (line.split()[1]).split(',')[0]
                     p2 = line.split()[2]
@@ -118,6 +111,28 @@ def main():
                     outFile += ", "
                     outFileInstIndexNumber += 6
                     dFoundedReferenceLabels[p2[:-1]] = outFileInstIndexNumber
+                    outFile += "0xFF, 0xFF"
+                    outFile += ", "
+                    outFileInstIndexNumber += 12
+                else:
+                    errorC()
+            # Check if JUMP LOCATION LABEL
+            elif line.find("JLL:") != -1:
+                label = line.split(":")[0]
+                dFoundedLabels[label] = outFileInstCodeOffset
+            # Check if it is reference to JUMP LOCATION LABEL
+            elif line.find("JLL@") != -1:
+                if len(line.split()) == 2:
+                    outFileInstCodeOffset += 3
+                    opc = line.split()[0]
+                    arg = line.split()[1]
+                    outFile += dOPCODES[opc]
+                    outFile += ", "
+                    outFileInstIndexNumber += 6
+                    dFoundedReferenceLabels[arg[:-1]] = outFileInstIndexNumber
+                    outFile += "0xFF, 0xFF"
+                    outFile += ", "
+                    outFileInstIndexNumber += 12
                 else:
                     errorC()
             else:
@@ -170,7 +185,6 @@ def main():
                 else:
                     errorC()
             line = fd.readline()
-            indexNumber += 1
     if bool(dFoundedReferenceLabels):
         outFile = changeLabelToAddr(outFile)
     outFD = open((sys.argv[1].split("."))[0] + ".vex", "w")
