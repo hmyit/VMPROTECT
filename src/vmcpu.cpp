@@ -51,7 +51,9 @@ void VMCPU::run()
                 vmPrintf("[DEBUG] EC");
                 exit = true;
                 break;
-            /* 
+            /*  ********************************
+                            MOV
+                ******************************** 
                 MOV - move from register to register
                 02 25 => MOV R2,R5
                 02 00 => MOV R0,R0
@@ -104,11 +106,11 @@ void VMCPU::run()
                 06 01 15 28 => MOV R1, 2815
             */
             case 0x06:
+                vmPrintf("[DEBUG] MOVW");
                 bTmp_0 = AS->data[REGS->PC++];
                 if(bTmp_0 > 5) goto EXCEPTION;
                 REGS->R[bTmp_0] = *(WORD *) &AS->data[REGS->PC];
                 REGS->PC += 2;
-                vmPrintf("[DEBUG] MOVW");
                 break; 
             /* 
                 MOVBM - move byte from register to memory location 
@@ -163,8 +165,10 @@ void VMCPU::run()
                 if(wTmp_0 >= sizeof(AS->data)) goto EXCEPTION;
                 REGS->R[bTmp_0] = *(WORD*) &AS->data[wTmp_0];
                 break;
-            /*
-                Unconditional Jump
+            /*  ********************************
+                            JUMP
+                ********************************
+                JMP - unconditional jump
                 0B 15 00 => JMP 0015
             */
             case 0x0B:
@@ -174,6 +178,76 @@ void VMCPU::run()
                 if(wTmp_0 > sizeof(AS->data)) goto EXCEPTION;
                 REGS->PC = wTmp_0;
                 break; 
+            /*
+                JZ - jump if equal
+                0C 15 00
+            */
+            case 0x0C:
+                vmPrintf("[DEBUG] JZ");
+                wTmp_0 = *(WORD*) &AS->data[REGS->PC];
+                REGS->PC += 2;
+                if(wTmp_0 > sizeof(AS->data)) goto EXCEPTION;
+                if(REGS->ZF) REGS->PC = wTmp_0;
+                break;
+            /*
+                JNZ - jump if not equal
+                0D 15 00
+            */
+            case 0x0D:
+                vmPrintf("[DEBUG] JNZ");
+                wTmp_0 = *(WORD*) &AS->data[REGS->PC];
+                REGS->PC += 2;
+                if(wTmp_0 > sizeof(AS->data)) goto EXCEPTION;
+                if(!REGS->ZF) REGS->PC = wTmp_0;
+                break;
+            /*
+                JAE - jump if above or equal
+                0E 15 00
+            */
+            case 0x0E:
+                vmPrintf("[DEBUG] JAE");
+                wTmp_0 = *(WORD*) &AS->data[REGS->PC];
+                REGS->PC += 2;
+                if(wTmp_0 > sizeof(AS->data)) goto EXCEPTION;
+                if(REGS->ZF || !REGS->CF) REGS->PC = wTmp_0;
+                break;
+            /*
+                JBE - jump if below or equal
+                10 15 00
+            */
+            case 0x10:
+                vmPrintf("[DEBUG] JBE");
+                wTmp_0 = *(WORD*) &AS->data[REGS->PC];
+                REGS->PC += 2;
+                if(wTmp_0 > sizeof(AS->data)) goto EXCEPTION;
+                if(REGS->ZF || REGS->CF) REGS->PC = wTmp_0;
+                break;
+            /*
+                JB - jump if below
+                11 15 00
+            */
+            case 0x11:
+                vmPrintf("[DEBUG] JB");
+                wTmp_0 = *(WORD*) &AS->data[REGS->PC];
+                REGS->PC += 2;
+                if(wTmp_0 > sizeof(AS->data)) goto EXCEPTION;
+                if(!REGS->ZF && REGS->CF) REGS->PC = wTmp_0;
+                break;
+            /*
+                JA - jump if above
+                12 15 00
+            */
+            case 0x12:
+                vmPrintf("[DEBUG] JA");
+                wTmp_0 = *(WORD*) &AS->data[REGS->PC];
+                REGS->PC += 2;
+                if(wTmp_0 > sizeof(AS->data)) goto EXCEPTION;
+                if(!REGS->ZF && !REGS->CF) REGS->PC = wTmp_0;
+                break;
+            /*  ********************************
+                            ARITHMETIC
+                ********************************
+            */
             default:
             EXCEPTION:
                 vmPrintf("vCPU ERROR!");
