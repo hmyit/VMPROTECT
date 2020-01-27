@@ -1,9 +1,10 @@
 # Usr input (addr) saved in R0
 NOP
 NOPV
+MOVW R1, 1DL@
 EC
 
-DL0:
+1DL:
     "PASS",0
-DL1:
+2DL:
     "FAILED",0

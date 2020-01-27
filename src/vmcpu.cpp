@@ -108,6 +108,7 @@ void VMCPU::run()
                 if(bTmp_0 > 5) goto EXCEPTION;
                 REGS->R[bTmp_0] = *(WORD *) &AS->data[REGS->PC];
                 REGS->PC += 2;
+                vmPrintf("[DEBUG] MOVW");
                 break; 
             /* 
                 MOVBM - move byte from register to memory location 
