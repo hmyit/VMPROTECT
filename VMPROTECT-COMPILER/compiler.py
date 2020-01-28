@@ -120,12 +120,11 @@ def main():
                     outFile += dOPCODES[opc]
                     outFile += ", "
                     outFileInstIndexNumber += 6
-                    outFile += "0x" + param
+                    outFile += dREGS[param]
                     outFile += ", "
                     outFileInstIndexNumber += 6
                 # 2 PARAM
                 elif len(line.split()) == 3:
-                    outFileInstCodeOffset += 3
                     opc = line.split()[0]
                     p1 = (line.split()[1]).split(',')[0]
                     p2 = line.split()[2]
@@ -133,20 +132,22 @@ def main():
                     outFile += ", "
                     outFileInstIndexNumber += 6
                     if opc == "MOV":
-                        param1 = dREGS[p1]
-                        param2 = dREGS[p2][2:]
-                        outFile += param1 + param2
+                        param1 = dREGS[p1][3:]
+                        param2 = dREGS[p2][3:]
+                        outFile += "0x" + param1 + param2
                         outFile += ", "
                         outFileInstIndexNumber += 6
+                        outFileInstCodeOffset += 2
                     elif opc == "MOVMRB" or opc == "MOVMRW" or opc == "ADRR" or opc == "ADRRL" or opc == "SUBRR" or opc == "SUBRRL" or opc == "XOR" or opc == "XORL" or opc == "CMP" or opc == "CMPL":
                         param1 = dREGS[p1]
                         param2 = dREGS[p2]
                         outFile += param1
                         outFile += ", "
                         outFileInstIndexNumber += 6
-                        utFile += param2
+                        outFile += param2
                         outFile += ", "
                         outFileInstIndexNumber += 6
+                        outFileInstCodeOffset += 3
                     elif opc == "MOVMB" or opc == "MOVMW":
                         param1 = dREGS[p1]
                         outFile += param1
@@ -156,6 +157,7 @@ def main():
                         outFile += param2
                         outFile += ", "
                         outFileInstIndexNumber += 12
+                        outFileInstCodeOffset += 4
                     elif opc == "MOVBM" or opc == "MOVWM":
                         param2 = "0x" + p2[2:] + p2[:2]
                         outFile += ", "
@@ -164,6 +166,7 @@ def main():
                         outFile += param1
                         outFile += ", "
                         outFileInstIndexNumber += 6
+                        outFileInstCodeOffset += 3
                     elif opc == "MOVB":       
                         outFile += dREGS[p1]
                         outFile += ", "
@@ -171,6 +174,7 @@ def main():
                         outFile += "0x" + p2
                         outFile += ", "
                         outFileInstIndexNumber += 6
+                        outFileInstCodeOffset += 3
                     elif opc == "MOVW":
                         outFile += dREGS[p1]
                         outFile += ", "
@@ -181,6 +185,7 @@ def main():
                         outFile += "0x" + p2[:-2]
                         outFile += ", "
                         outFileInstIndexNumber += 6
+                        outFileInstCodeOffset += 4
                     elif opc == "JMP" or opc == "JZ" or opc == "JNZ" or opc == "JAE" or opc == "JBE" or opc == "JB" or opc == "JA":
                         outFile += "0x" + p2
                         outFile += ", "
@@ -188,6 +193,7 @@ def main():
                         outFile += "0x" + p1
                         outFile += ", "
                         outFileInstIndexNumber += 6
+                        outFileInstCodeOffset += 3
                     elif opc == "ADVR" or opc == "SUBVR":
                         param1 = dREGS[p1]
                         outFile += param1
@@ -197,10 +203,10 @@ def main():
                         outFile += param2
                         outFile += ", "
                         outFileInstIndexNumber += 12
+                        outFileInstCodeOffset += 4
                 # 3 PARAM
                 elif len(line.split()) == 4:
                     # TODO
-                    outFileInstCodeOffset += 4
                     pass
                 else:
                     errorC()
@@ -220,9 +226,11 @@ dOPCODES = {
     "POCN":"0x52",
     
     # 1 PARAM
-    "MOV":"0x02",
+    "PUSH":"0x61",
+    "POP":"0x62",
 
     # 2 PARAM
+    "MOV":"0x02",
     "JMP":"0x11",
     "JZ":"0x12",
     "JNZ":"0x13",
@@ -230,8 +238,6 @@ dOPCODES = {
     "JBE":"0x15",
     "JB":"0x16",
     "JA":"0x17",
-    "PUSH":"0x61",
-    "POP":"0x62",
 
     # 3 PARAM
     "MOVB":"0x05",

@@ -1,6 +1,6 @@
 #include "../include/vmcpu.hpp"
 
-#define V_DEBUG
+//#define V_DEBUG
 
 VMCPU::VMCPU()
 {
@@ -46,11 +46,13 @@ void VMCPU::run()
                 #ifdef V_DEBUG
                     std::cout << "[DEBUG] NOP" << std::endl;
                 #endif
+                opcode+=20;
                 break;
             case 0x01:
                 #ifdef V_DEBUG
                     std::cout << "[DEBUG] NOPV" << std::endl;
                 #endif
+                opcode*=5;
                 break;
             /* EC - end of code */
             case 0xEC:
@@ -179,10 +181,9 @@ void VMCPU::run()
                 if(bTmp_0 > 5) goto EXCEPTION;
                 bTmp_1 = AS->data[REGS->PC++];
                 if(bTmp_1 > 5) goto EXCEPTION;
-                wTmp_0 = REGS->R[bTmp_1];
-                if(wTmp_0 >= sizeof(AS->data)) goto EXCEPTION;
+                if(REGS->R[bTmp_1] >= sizeof(AS->data)) goto EXCEPTION;
                 REGS->R[bTmp_0] = 0;
-                *(BYTE*) &REGS->R[bTmp_0] = AS->data[wTmp_0];
+                *(BYTE*) &REGS->R[bTmp_0] = AS->data[REGS->R[bTmp_1]];
                 break;
             /* 
                 MOVMRW - move word from memory to register
@@ -197,9 +198,8 @@ void VMCPU::run()
                 if(bTmp_0 > 5) goto EXCEPTION;
                 bTmp_1 = AS->data[REGS->PC++];
                 if(bTmp_1 > 5) goto EXCEPTION;
-                wTmp_0 = REGS->R[bTmp_1];
                 if(wTmp_0 >= sizeof(AS->data)) goto EXCEPTION;
-                REGS->R[bTmp_0] = *(WORD*) &AS->data[wTmp_0];
+                REGS->R[bTmp_0] = *(WORD*) &AS->data[REGS->R[bTmp_1]];
                 break;
             /*  ********************************
                             JUMP
@@ -566,8 +566,8 @@ void VMCPU::run()
                     std::cout << "[ERROR] STACK UNDERFLOW!" << std::endl;
                     goto EXCEPTION;
                 }
-                wTmp_0 = AS->stack[REGS->SP++];
-                vmPrint(wTmp_0);
+                bTmp_0 = *(BYTE*) &AS->stack[REGS->SP++];
+                vmPrint(bTmp_0);
                 break;
             /*
                 POCN - Print char with new line
@@ -583,8 +583,8 @@ void VMCPU::run()
                     std::cout << "[ERROR] STACK UNDERFLOW!" << std::endl;
                     goto EXCEPTION;
                 }
-                wTmp_0 = AS->stack[REGS->SP++];
-                vmPrint(wTmp_0);
+                bTmp_0 = *(BYTE*) &AS->stack[REGS->SP++];
+                vmPrintN(bTmp_0);
                 break;
             /*  
                 ********************************
@@ -602,12 +602,12 @@ void VMCPU::run()
     }
 }
 
-void VMCPU::vmPrint(WORD s)
+void VMCPU::vmPrint(BYTE s)
 {
     std::cout << s;
 }
 
-void VMCPU::vmPrintN(WORD s)
+void VMCPU::vmPrintN(BYTE s)
 {
     std::cout << s << std::endl;
 }
