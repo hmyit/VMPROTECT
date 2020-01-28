@@ -172,6 +172,14 @@ dOPCODES = {
     "MOVB":"0x05",
     "MOVMRB":"0x09",
     "MOVMRW":"0x0A",
+    "ADRR":"0x22",
+    "ADRRL":"0x23",
+    "SUBRR":"0x25",
+    "SUBRRL":"0x26",
+    "XOR":"0x27",
+    "XORL":"0x28",
+    "CMP":"0x31",
+    "CMPL":"0x32",
 
     # 4 PARAM
     "MOVMB":"0x03",
@@ -179,6 +187,8 @@ dOPCODES = {
     "MOVW":"0x06",
     "MOVBM":"0x07",
     "MOVWM":"0x08",
+    "ADVR":"0x21",
+    "SUBVR":"0x24",
     
     # 1 PARAM
     "JMP":"0x11",
