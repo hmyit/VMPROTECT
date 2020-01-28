@@ -1,39 +1,5 @@
 import sys
 
-dOPCODES = {
-    # NO PARAM
-    "NOP":"0x00",
-    "NOPV":"0x01",
-    "EC":"0xEC",
-    
-    # 2 PARAM
-    "MOV":"0x02",
-
-    # 3 PARAM
-    "MOVB":"0x05",
-    "MOVMRB":"0x09",
-    "MOVMRW":"0x0A",
-
-    # 4 PARAM
-    "MOVMB":"0x03",
-    "MOVMW":"0x04",
-    "MOVW":"0x06",
-    "MOVBM":"0x07",
-    "MOVWM":"0x08",
-    
-    # 1 PARAM
-    "JMP":"0x0B"
-}
-
-dREGS = {
-    "R0":"0x00",
-    "R1":"0x01",
-    "R2":"0x02",
-    "R3":"0x03",
-    "R4":"0x04",
-    "R5":"0x05"
-}
-
 dFoundedReferenceLabels = {} # {label: str position}
 dFoundedLabels = {} # {label: code position}
 
@@ -190,6 +156,50 @@ def main():
     outFD = open((sys.argv[1].split("."))[0] + ".vex", "w")
     outFD.write(outFile[:-2])
     outFD.close()
+
+dOPCODES = {
+    # NO PARAM
+    "NOP":"0x00",
+    "NOPV":"0x01",
+    "EC":"0xEC",
+    "POC":"0x51",
+    "POCN":"0x52",
+    
+    # 2 PARAM
+    "MOV":"0x02",
+
+    # 3 PARAM
+    "MOVB":"0x05",
+    "MOVMRB":"0x09",
+    "MOVMRW":"0x0A",
+
+    # 4 PARAM
+    "MOVMB":"0x03",
+    "MOVMW":"0x04",
+    "MOVW":"0x06",
+    "MOVBM":"0x07",
+    "MOVWM":"0x08",
+    
+    # 1 PARAM
+    "JMP":"0x11",
+    "JZ":"0x12",
+    "JNZ":"0x13",
+    "JAE":"0x14",
+    "JBE":"0x15",
+    "JB":"0x16",
+    "JA":"0x17",
+    "PUSH":"0x61",
+    "POP":"0x62"
+}
+
+dREGS = {
+    "R0":"0x00",
+    "R1":"0x01",
+    "R2":"0x02",
+    "R3":"0x03",
+    "R4":"0x04",
+    "R5":"0x05"
+}
 
 if __name__ == "__main__":
     main()

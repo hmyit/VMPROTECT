@@ -45,7 +45,9 @@ class VMCPU {
         PREGISTERSS REGS;
 
     private:
-        void vmPrintf(const char *);
+        void vmPrint(WORD s);
+        void vmPrintN(WORD s);
+        //void vmScan();
 
     public:
         VMCPU();

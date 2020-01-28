@@ -41,24 +41,27 @@ void VMCPU::run()
         {
             /* NOP */
             case 0x00:
-                vmPrintf("[DEBUG] NOP");
+                std::cout << "[DEBUG] NOP" << std::endl;
                 break;
             case 0x01:
-                vmPrintf("[DEBUG] NOPV");
+                std::cout << "[DEBUG] NOPV" << std::endl;
                 break;
             /* EC - end of code */
             case 0xEC:
-                vmPrintf("[DEBUG] EC");
+                std::cout << "[DEBUG] EC" << std::endl;
                 exit = true;
                 break;
             /*  ********************************
                             MOV
                 ******************************** 
+            */
+            /*
                 MOV - move from register to register
                 02 25 => MOV R2,R5
                 02 00 => MOV R0,R0
             */
             case 0x02:
+                std::cout << "[DEBUG] MOV" << std::endl;
                 bTmp_0 = AS->data[REGS->PC++];
                 if((bTmp_0 & 0xF0) <= 0x60 && (bTmp_0 & 0x0F) <= 5){
                     // bTmp_0 == XXXX XXXX, XXXX XXXX & 0xF0 == XXXX 0000
@@ -71,6 +74,7 @@ void VMCPU::run()
                 02 03 04 01 => MOVX R3,BYTE [0104]
             */
             case 0x03:
+                std::cout << "[DEBUG] MOVMB" << std::endl;
                 bTmp_0 = AS->data[REGS->PC++];
                 if(bTmp_0 > 5) goto EXCEPTION;
                 wTmp_0 = *(WORD*) &AS->data[REGS->PC];
@@ -84,6 +88,7 @@ void VMCPU::run()
                 04 03 04 01 => MOV R3, WORD [0104]
             */
             case 0x04:
+                std::cout << "[DEBUG] MOVMW" << std::endl;
                 bTmp_0 = AS->data[REGS->PC++];
                 if(bTmp_0 > 5) goto EXCEPTION;
                 wTmp_0 = *(WORD*) &AS->data[REGS->PC];
@@ -96,6 +101,7 @@ void VMCPU::run()
                 05 02 43 => MOVX R2, 43
             */
             case 0x05:
+                std::cout << "[DEBUG] MOVB" << std::endl;
                 bTmp_0 = AS->data[REGS->PC++];
                 if(bTmp_0 > 5) goto EXCEPTION;
                 REGS->R[bTmp_0] = 0;
@@ -106,7 +112,7 @@ void VMCPU::run()
                 06 01 15 28 => MOV R1, 2815
             */
             case 0x06:
-                vmPrintf("[DEBUG] MOVW");
+                std::cout << "[DEBUG] MOVW" << std::endl;
                 bTmp_0 = AS->data[REGS->PC++];
                 if(bTmp_0 > 5) goto EXCEPTION;
                 REGS->R[bTmp_0] = *(WORD *) &AS->data[REGS->PC];
@@ -117,6 +123,7 @@ void VMCPU::run()
                 07 04 43 13 => MOV BYTE [1343], R4
             */
             case 0x07:
+                std::cout << "[DEBUG] MOVBM" << std::endl;
                 bTmp_0 = AS->data[REGS->PC++];
                 if(bTmp_0 > 5) goto EXCEPTION;
                 wTmp_0 = *(WORD*) &AS->data[REGS->PC];
@@ -129,6 +136,7 @@ void VMCPU::run()
                 08 04 43 13 => MOV WORD [1343], R4
             */
             case 0x08:
+                std::cout << "[DEBUG] MOVWM" << std::endl;
                 bTmp_0 = AS->data[REGS->PC++];
                 if(bTmp_0 > 5) goto EXCEPTION;
                 wTmp_0 = *(WORD*) &AS->data[REGS->PC];
@@ -142,6 +150,7 @@ void VMCPU::run()
                 09 02 01 => MOVMRB R2, R1
             */
             case 0x09:
+                std::cout << "[DEBUG] MOVMRB" << std::endl;
                 bTmp_0 = AS->data[REGS->PC++];
                 if(bTmp_0 > 5) goto EXCEPTION;
                 bTmp_1 = AS->data[REGS->PC++];
@@ -157,6 +166,7 @@ void VMCPU::run()
                 0A 02 01 => MOVMRW R2, R1
             */
             case 0x0A:
+                std::cout << "[DEBUG] MOVMRW" << std::endl;
                 bTmp_0 = AS->data[REGS->PC++];
                 if(bTmp_0 > 5) goto EXCEPTION;
                 bTmp_1 = AS->data[REGS->PC++];
@@ -168,11 +178,13 @@ void VMCPU::run()
             /*  ********************************
                             JUMP
                 ********************************
-                JMP - unconditional jump
-                0B 15 00 => JMP 0015
             */
-            case 0x0B:
-                vmPrintf("[DEBUG] JMP");
+            /*
+                JMP - unconditional jump
+                11 15 00 => JMP 0015
+            */
+            case 0x11:
+                std::cout << "[DEBUG] JMP" << std::endl;
                 wTmp_0 = *(WORD*) &AS->data[REGS->PC];
                 REGS->PC += 2;
                 if(wTmp_0 > sizeof(AS->data)) goto EXCEPTION;
@@ -180,10 +192,10 @@ void VMCPU::run()
                 break; 
             /*
                 JZ - jump if equal
-                0C 15 00
+                12 15 00
             */
-            case 0x0C:
-                vmPrintf("[DEBUG] JZ");
+            case 0x12:
+                std::cout << "[DEBUG] JZ" << std::endl;
                 wTmp_0 = *(WORD*) &AS->data[REGS->PC];
                 REGS->PC += 2;
                 if(wTmp_0 > sizeof(AS->data)) goto EXCEPTION;
@@ -191,10 +203,10 @@ void VMCPU::run()
                 break;
             /*
                 JNZ - jump if not equal
-                0D 15 00
+                13 15 00
             */
-            case 0x0D:
-                vmPrintf("[DEBUG] JNZ");
+            case 0x13:
+                std::cout << "[DEBUG] JNZ" << std::endl;
                 wTmp_0 = *(WORD*) &AS->data[REGS->PC];
                 REGS->PC += 2;
                 if(wTmp_0 > sizeof(AS->data)) goto EXCEPTION;
@@ -202,10 +214,10 @@ void VMCPU::run()
                 break;
             /*
                 JAE - jump if above or equal
-                0E 15 00
+                14 15 00
             */
-            case 0x0E:
-                vmPrintf("[DEBUG] JAE");
+            case 0x14:
+                std::cout << "[DEBUG] JAE" << std::endl;
                 wTmp_0 = *(WORD*) &AS->data[REGS->PC];
                 REGS->PC += 2;
                 if(wTmp_0 > sizeof(AS->data)) goto EXCEPTION;
@@ -213,10 +225,10 @@ void VMCPU::run()
                 break;
             /*
                 JBE - jump if below or equal
-                10 15 00
+                15 15 00
             */
-            case 0x10:
-                vmPrintf("[DEBUG] JBE");
+            case 0x15:
+                std::cout << "[DEBUG] JBE" << std::endl;
                 wTmp_0 = *(WORD*) &AS->data[REGS->PC];
                 REGS->PC += 2;
                 if(wTmp_0 > sizeof(AS->data)) goto EXCEPTION;
@@ -224,10 +236,10 @@ void VMCPU::run()
                 break;
             /*
                 JB - jump if below
-                11 15 00
+                16 15 00
             */
-            case 0x11:
-                vmPrintf("[DEBUG] JB");
+            case 0x16:
+                std::cout << "[DEBUG] JB" << std::endl;
                 wTmp_0 = *(WORD*) &AS->data[REGS->PC];
                 REGS->PC += 2;
                 if(wTmp_0 > sizeof(AS->data)) goto EXCEPTION;
@@ -235,10 +247,10 @@ void VMCPU::run()
                 break;
             /*
                 JA - jump if above
-                12 15 00
+                17 15 00
             */
-            case 0x12:
-                vmPrintf("[DEBUG] JA");
+            case 0x17:
+                std::cout << "[DEBUG] JA" << std::endl;
                 wTmp_0 = *(WORD*) &AS->data[REGS->PC];
                 REGS->PC += 2;
                 if(wTmp_0 > sizeof(AS->data)) goto EXCEPTION;
@@ -248,15 +260,97 @@ void VMCPU::run()
                             ARITHMETIC
                 ********************************
             */
+
+            /*  ********************************
+                            COMPARE
+                ********************************
+            */
+
+            /*  ********************************
+                            STACK
+                ********************************
+            */
+            /*
+                PUSH REGISTER
+                61 03 => PUSH R3
+            */
+            case 0x61:
+                std::cout << "[DEBUG] PUSH" << std::endl;
+                bTmp_0 = AS->data[REGS->PC++];
+                if(bTmp_0 > 5) goto EXCEPTION;
+                REGS->SP -= 1;
+                if(REGS->SP == 0xFFFF) {
+                    std::cout << "[ERROR] STACK OVERFLOW!" << std::endl;
+                    goto EXCEPTION;
+                }
+                AS->stack[REGS->SP] = REGS->R[bTmp_0];
+                break;
+             /*
+                POP TO A REGISTER
+                62 03 => POP R3
+            */
+            case 0x62:
+                std::cout << "[DEBUG] POP" << std::endl;
+                bTmp_0 = AS->data[REGS->PC++];
+                if(bTmp_0 > 5) goto EXCEPTION;
+                if(&AS->stack[REGS->SP] == &AS->stack[sizeof(AS->stack)/sizeof(WORD)]){
+                    std::cout << "[ERROR] STACK UNDERFLOW!" << std::endl;
+                    goto EXCEPTION;
+                }
+                REGS->R[bTmp_0] = AS->stack[REGS->SP];
+                REGS->SP += 1;
+                break;
+            /*  ********************************
+                            IN/OUT
+                ********************************
+            */
+            /*
+                POC - Print char without new line
+                    the value must be at the top of
+                    the stack
+                51 => POC
+            */
+            case 0x51:
+                if(&AS->stack[REGS->SP] == &AS->stack[sizeof(AS->stack)/sizeof(WORD)]){
+                    std::cout << "[ERROR] STACK UNDERFLOW!" << std::endl;
+                    goto EXCEPTION;
+                }
+                wTmp_0 = AS->stack[REGS->SP++];
+                vmPrint(wTmp_0);
+                break;
+            /*
+                POCN - Print char with new line
+                    the value must be at the top of
+                    the stack
+                42 => POCN
+            */
+            case 0x52:
+                if(&AS->stack[REGS->SP] == &AS->stack[sizeof(AS->stack)/sizeof(WORD)]){
+                    std::cout << "[ERROR] STACK UNDERFLOW!" << std::endl;
+                    goto EXCEPTION;
+                }
+                wTmp_0 = AS->stack[REGS->SP++];
+                vmPrint(wTmp_0);
+                break;
+            /*  
+                ********************************
+                            DEFAULT
+                ********************************
+            */
             default:
             EXCEPTION:
-                vmPrintf("vCPU ERROR!");
+                std::cout << "[ERROR] vCPU CRASH!" << std::endl;
                 exit = true;
         }
     }
 }
 
-void VMCPU::vmPrintf(const char *s)
+void VMCPU::vmPrint(WORD s)
+{
+    std::cout << s;
+}
+
+void VMCPU::vmPrintN(WORD s)
 {
     std::cout << s << std::endl;
 }
