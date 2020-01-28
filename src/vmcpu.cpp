@@ -220,7 +220,7 @@ void VMCPU::run()
                 break; 
             /*
                 JZ - jump if equal
-                12 15 00
+                12 15 00 => JZ 0015
             */
             case 0x12:
                 #ifdef V_DEBUG
@@ -233,7 +233,7 @@ void VMCPU::run()
                 break;
             /*
                 JNZ - jump if not equal
-                13 15 00
+                13 15 00 => JNZ 0015
             */
             case 0x13:
                 #ifdef V_DEBUG
@@ -246,7 +246,7 @@ void VMCPU::run()
                 break;
             /*
                 JAE - jump if above or equal
-                14 15 00
+                14 15 00 => JAE 0015
             */
             case 0x14:
                 #ifdef V_DEBUG
@@ -259,7 +259,7 @@ void VMCPU::run()
                 break;
             /*
                 JBE - jump if below or equal
-                15 15 00
+                15 15 00 => JBE 0015
             */
             case 0x15:
                 #ifdef V_DEBUG
@@ -272,7 +272,7 @@ void VMCPU::run()
                 break;
             /*
                 JB - jump if below
-                16 15 00
+                16 15 00 => JB 0015
             */
             case 0x16:
                 #ifdef V_DEBUG
@@ -285,7 +285,7 @@ void VMCPU::run()
                 break;
             /*
                 JA - jump if above
-                17 15 00
+                17 15 00 => JA 0015
             */
             case 0x17:
                 #ifdef V_DEBUG
