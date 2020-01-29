@@ -1,33 +1,34 @@
 import sys
 
-dFoundedReferenceLabels = {} # {label: str position}
+dFoundedReferenceLabels = {} # {label: [str position]}
 dFoundedLabels = {} # {label: code position}
 
 def changeLabelToAddr(outFile):
     for k in dFoundedReferenceLabels.keys():
-        tmp1 = outFile[:dFoundedReferenceLabels[k]]
-        tmp2 = outFile[dFoundedReferenceLabels[k] + 12:]
-        val = dFoundedLabels[k]
+        for l in dFoundedReferenceLabels[k]:
+            tmp1 = outFile[:l]
+            tmp2 = outFile[l + 12:]
+            val = dFoundedLabels[k]
 
-        if val < 10:
-            tmp1 += "0x0" + hex(val)[2:] + ", 0x00, "
-            outFile = tmp1 + tmp2
-        elif val < 16:
-            tmp1 += "0x0" + hex(val)[2:] + ", 0x00, "
-            outFile = tmp1 + tmp2
-        elif val < 100:
-            tmp1 += hex(val) + ", 0x00, "
-            outFile = tmp1 + tmp2
-        elif val < 1000:
-            t1 = hex(val)[2:3]
-            t2 = hex(val)[3:5]
-            tmp1 += "0x" + t2 + ", 0x0" + t1 + ", "
-            outFile = tmp1 + tmp2
-        else:
-            t1 = hex(val)[2:4]
-            t2 = hex(val)[4:6]
-            tmp1 += "0x" + t2 + ", 0x" + t1 + ", "
-            outFile = tmp1 + tmp2
+            if val < 10:
+                tmp1 += "0x0" + hex(val)[2:] + ", 0x00, "
+                outFile = tmp1 + tmp2
+            elif val < 16:
+                tmp1 += "0x0" + hex(val)[2:] + ", 0x00, "
+                outFile = tmp1 + tmp2
+            elif val < 100:
+                tmp1 += hex(val) + ", 0x00, "
+                outFile = tmp1 + tmp2
+            elif val < 1000:
+                t1 = hex(val)[2:3]
+                t2 = hex(val)[3:5]
+                tmp1 += "0x" + t2 + ", 0x0" + t1 + ", "
+                outFile = tmp1 + tmp2
+            else:
+                t1 = hex(val)[2:4]
+                t2 = hex(val)[4:6]
+                tmp1 += "0x" + t2 + ", 0x" + t1 + ", "
+                outFile = tmp1 + tmp2
     return outFile
 
 def errorC():
@@ -76,7 +77,10 @@ def main():
                     outFile += dREGS[p1]
                     outFile += ", "
                     outFileInstIndexNumber += 6
-                    dFoundedReferenceLabels[p2[:-1]] = outFileInstIndexNumber
+                    if p2[:-1] in dFoundedReferenceLabels.keys():
+                        dFoundedReferenceLabels[p2[:-1]].append(outFileInstIndexNumber)
+                    else:
+                        dFoundedReferenceLabels[p2[:-1]] = [outFileInstIndexNumber]
                     outFile += "0xFF, 0xFF"
                     outFile += ", "
                     outFileInstIndexNumber += 12
@@ -95,7 +99,10 @@ def main():
                     outFile += dOPCODES[opc]
                     outFile += ", "
                     outFileInstIndexNumber += 6
-                    dFoundedReferenceLabels[arg[:-1]] = outFileInstIndexNumber
+                    if arg[:-1] in dFoundedReferenceLabels.keys():
+                        dFoundedReferenceLabels[arg[:-1]].append(outFileInstIndexNumber)
+                    else:
+                        dFoundedReferenceLabels[arg[:-1]] = [outFileInstIndexNumber]
                     outFile += "0xFF, 0xFF"
                     outFile += ", "
                     outFileInstIndexNumber += 12
@@ -214,7 +221,14 @@ def main():
     if bool(dFoundedReferenceLabels):
         outFile = changeLabelToAddr(outFile)
     outFD = open((sys.argv[1].split("."))[0] + ".vex", "w")
-    outFD.write(outFile[:-2])
+    outF = outFile[:-2]
+    count = 0
+    for c in outF:
+        outFD.write(c)
+        count += 1
+        if count == 48:
+            count = 0
+            outFD.write("\n")
     outFD.close()
 
 dOPCODES = {
