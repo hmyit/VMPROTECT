@@ -67,8 +67,8 @@ void VMCPU::run()
             */
             /*
                 MOV - move from register to register
-                02 25 => MOV R2,R5
-                02 00 => MOV R0,R0
+                02 25 => MOV R2, R5
+                02 00 => MOV R0, R0
             */
             case 0x02:
                 #ifdef V_DEBUG
@@ -83,7 +83,7 @@ void VMCPU::run()
                 break;
             /* 
                 MOVMB - move and extend byte from memory to register 
-                02 03 04 01 => MOVX R3,BYTE [0104]
+                02 03 04 01 => MOVMB R3, 0104
             */
             case 0x03:
                 #ifdef V_DEBUG
@@ -99,7 +99,7 @@ void VMCPU::run()
                 break;  
             /* 
                 MOVMW - move word from memory to register 
-                04 03 04 01 => MOV R3, WORD [0104]
+                04 03 04 01 => MOVMW R3, 0104
             */
             case 0x04:
                 #ifdef V_DEBUG
@@ -114,7 +114,7 @@ void VMCPU::run()
                 break;  
             /* 
                 MOVB - move and extend byte to register 
-                05 02 43 => MOVX R2, 43
+                05 02 43 => MOVB R2, 43
             */
             case 0x05:
                 #ifdef V_DEBUG
@@ -127,7 +127,7 @@ void VMCPU::run()
                 break; 
             /* 
                 MOVW - move word to register 
-                06 01 15 28 => MOV R1, 2815
+                06 01 15 28 => MOVW R1, 2815
             */
             case 0x06:
                 #ifdef V_DEBUG
@@ -140,7 +140,7 @@ void VMCPU::run()
                 break; 
             /* 
                 MOVBM - move byte from register to memory location 
-                07 04 43 13 => MOV BYTE [1343], R4
+                07 04 43 13 => MOVBM 1343, R4
             */
             case 0x07:
                 #ifdef V_DEBUG
@@ -155,7 +155,7 @@ void VMCPU::run()
                 break;  
             /* 
                 MOVWM - move word from register to memory location 
-                08 04 43 13 => MOV WORD [1343], R4
+                08 04 43 13 => MOVWM 1343, R4
             */
             case 0x08:
                 #ifdef V_DEBUG
@@ -198,7 +198,7 @@ void VMCPU::run()
                 if(bTmp_0 > 5) goto EXCEPTION;
                 bTmp_1 = AS->data[REGS->PC++];
                 if(bTmp_1 > 5) goto EXCEPTION;
-                if(wTmp_0 >= sizeof(AS->data)) goto EXCEPTION;
+                if(REGS->R[bTmp_1] >= sizeof(AS->data)) goto EXCEPTION;
                 REGS->R[bTmp_0] = *(WORD*) &AS->data[REGS->R[bTmp_1]];
                 break;
             /*  ********************************
