@@ -3,7 +3,6 @@ A code obfuscation method using virtual machines to protect a product.
 
 A virtual machine simulates a CPU along with a few other hardware components, allowing it to perform arithmetic, read and write to memory and interact with I/O devices. It can understand a machine language which you can use to program it. Virtual machines used in code obfuscation are completely different than common virtual machnines. They are very specific to the task of executing a few set of instructions. Each instruction is given a custom opcode (often generated at random).
 
-***
 ## Documentation
 The VM will simulate a fictional cpu. It has a custom instrucion set compared to x86-64.
 
@@ -90,7 +89,6 @@ EC  | EC | End of code and end of the VM's cpu |
 
 </details>
 
-***
 ## Solution
 
 <details>
