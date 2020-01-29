@@ -10,29 +10,25 @@ def changeLabelToAddr(outFile):
             tmp2 = outFile[l + 12:]
             val = dFoundedLabels[k]
 
-            if val < 10:
-                tmp1 += "0x0" + hex(val)[2:] + ", 0x00, "
+            sVal = '{0:02X}'.format(val)
+
+            if len(sVal) == 2:
+                tmp1 += "0x" + sVal + ", 0x00, "
                 outFile = tmp1 + tmp2
-            elif val < 16:
-                tmp1 += "0x0" + hex(val)[2:] + ", 0x00, "
+            elif len(sVal) == 3:
+                tmp1 += "0x" + sVal[1:] + ", 0x0" + sVal[:1] + ", "
                 outFile = tmp1 + tmp2
-            elif val < 100:
-                tmp1 += hex(val) + ", 0x00, "
-                outFile = tmp1 + tmp2
-            elif val < 1000:
-                t1 = hex(val)[2:3]
-                t2 = hex(val)[3:5]
-                tmp1 += "0x" + t2 + ", 0x0" + t1 + ", "
-                outFile = tmp1 + tmp2
-            else:
-                t1 = hex(val)[2:4]
-                t2 = hex(val)[4:6]
+            elif len(sVal) == 4:
+                t1 = '{0:02X}'.format(val)[:2]
+                t2 = '{0:02X}'.format(val)[2:]
                 tmp1 += "0x" + t2 + ", 0x" + t1 + ", "
                 outFile = tmp1 + tmp2
+            else:
+                errorC(l)
     return outFile
 
-def errorC():
-    print("[ERROR] Unknow instruction!")
+def errorC(codeLine):
+    print("[ERROR] Unknow instruction at line: " + str(codeLine) + "!")
     print("[ERROR] Compilation failed!")
     exit()
 
@@ -56,7 +52,7 @@ def main():
                 text = line.split(",")[0]
                 dFoundedLabels[label] = outFileInstCodeOffset
                 for i in range(text.find("\"") + 1, len(text) - 1):
-                    outFile += str(hex(ord(text[i])))
+                    outFile += hex(ord(text[i]))
                     outFile += ", "
                     outFileInstIndexNumber += 6
                     outFileInstCodeOffset += 1
@@ -85,7 +81,7 @@ def main():
                     outFile += ", "
                     outFileInstIndexNumber += 12
                 else:
-                    errorC()
+                    errorC(outFileInstIndexNumber)
             # Check if JUMP LOCATION LABEL
             elif line.find("JLL:") != -1:
                 label = line.split(":")[0]
@@ -107,7 +103,7 @@ def main():
                     outFile += ", "
                     outFileInstIndexNumber += 12
                 else:
-                    errorC()
+                    errorC(outFileInstIndexNumber)
             else:
             # Parse code
                 # NO PARAM
@@ -163,16 +159,16 @@ def main():
                         param2 = "0x" + p2[2:] + ", 0x" + p2[:2]
                         outFile += param2
                         outFile += ", "
-                        outFileInstIndexNumber += 12
+                        outFileInstIndexNumber += 10
                         outFileInstCodeOffset += 4
                     elif opc == "MOVBM" or opc == "MOVWM":
-                        param2 = "0x" + p2[2:] + p2[:2]
-                        outFile += ", "
-                        outFileInstIndexNumber += 8
                         param1 = dREGS[p1]
                         outFile += param1
                         outFile += ", "
                         outFileInstIndexNumber += 6
+                        param2 = "0x" + p2[2:] + ", 0x" + p2[:2]
+                        outFile += ", "
+                        outFileInstIndexNumber += 12
                         outFileInstCodeOffset += 3
                     elif opc == "MOVB":       
                         outFile += dREGS[p1]
@@ -216,19 +212,23 @@ def main():
                     # TODO
                     pass
                 else:
-                    errorC()
+                    errorC(outFileInstIndexNumber)
             line = fd.readline()
     if bool(dFoundedReferenceLabels):
         outFile = changeLabelToAddr(outFile)
     outFD = open((sys.argv[1].split("."))[0] + ".vex", "w")
     outF = outFile[:-2]
     count = 0
-    for c in outF:
-        outFD.write(c)
-        count += 1
-        if count == 48:
-            count = 0
-            outFD.write("\n")
+    outFD.write(outF)
+    # for c in outF:
+    #     outFD.write(c)
+    #     count += 1
+        # if count >= 48:
+        #     if(c == " "):
+        #         count = 0
+        #         outFD.write("\n")
+        #     else:
+        #         outFD.write(c)
     outFD.close()
 
 dOPCODES = {

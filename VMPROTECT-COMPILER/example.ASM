@@ -2,12 +2,84 @@
 # DATA LABEL
 # JUMP LOCATION LABEL
 
+    MOV R1, R0
+    MOVW R3, 0003
+    MOVW R2, 0000
+    MOVW R4, 0000
+    MOVW R5, 0000
+    ADVR R3, 0002
+
+9JLL:
+    MOVMRB R2, R1
+    ADRR R4, R2
+    ADVR R4, 0005
+    ADVR R1, 0001
+    MOVMRB R2, R1
+    CMP R2, R5
+    JZ 8JLL@
+
+    ADRR R4, R2
+    ADVR R4, 000A
+    ADVR R1, 0001
+    MOVMRB R2, R1
+    CMP R2, R5
+    JZ 8JLL@
+
+    ADRR R4, R2
+    SUBVR R4, 0006
+    ADVR R1, 0001
+    MOVMRB R2, R1
+    CMP R2, R5
+    JZ 8JLL@
+
+    ADRR R4, R2
+    SUBVR R4, 000C
+    ADVR R1, 0001
+    MOVMRB R2, R1
+    CMP R2, R5
+    JZ 8JLL@
+
+    ADRR R4, R2
+    ADVR R4, 000F
+    ADVR R1, 0001
+    MOVMRB R2, R1
+    CMP R2, R5
+    JZ 8JLL@
+
+    JNZ 9JLL@
+
+8JLL:    
+    ADVR R3, 0005
+    MOVW R5, 0980
+# XOR 98A, 980
+    XOR R4, R5
+    CMP R4, R3
+    JZ 6JLL@
+    JNZ 7JLL@
+
+6JLL:
+# PRINT "PASS"
+    JMP 5JLL@
+
+7JLL:
+# PRINT "FAILED"
+    JMP 4JLL@
+
+5JLL:
     MOVW R1, 1DL@
+    JMP 3JLL@
+
+4JLL:
+    MOVW R1, 2DL@
+    JMP 3JLL@
+
+3JLL:
     MOV R2, R1
     ADVR R2, 0001
     MOVW R3, 0000
     MOVW R4, 0000
-5JLL:
+
+1JLL:
     MOVMRB R3, R1
     PUSH R3
     POC
@@ -15,9 +87,10 @@
     ADVR R2, 0001
     MOVMRB R3, R2
     CMP R3, R4
-    JZ 4JLL@
-    JNZ 5JLL@
-4JLL:
+    JZ 2JLL@
+    JNZ 1JLL@
+
+2JLL:
     MOVMRB R3, R1
     PUSH R3
     POCN
