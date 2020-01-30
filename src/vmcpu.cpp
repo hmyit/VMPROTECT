@@ -526,7 +526,11 @@ void VMCPU::run()
                 if(bTmp_0 > 5) goto EXCEPTION;
                 REGS->SP -= 1;
                 if(REGS->SP == 0xFFFF) {
-                    std::cout << "[ERROR] STACK OVERFLOW!" << std::endl;
+                    #ifndef _VM_TEST_
+                        std::cout << "[ERROR] STACK OVERFLOW!" << std::endl;
+                    #else
+                        vcpuFlag = VCpuFlag::OVERFLOW;
+                    #endif
                     goto EXCEPTION;
                 }
                 AS->stack[REGS->SP] = REGS->R[bTmp_0];
@@ -542,7 +546,11 @@ void VMCPU::run()
                 bTmp_0 = AS->data[REGS->PC++];
                 if(bTmp_0 > 5) goto EXCEPTION;
                 if(&AS->stack[REGS->SP] == &AS->stack[sizeof(AS->stack)/sizeof(WORD)]){
-                    std::cout << "[ERROR] STACK UNDERFLOW!" << std::endl;
+                    #ifndef _VM_TEST_
+                        std::cout << "[ERROR] STACK UNDERFLOW!" << std::endl;
+                    #else
+                        vcpuFlag = VCpuFlag::UNDERFLOW;
+                    #endif
                     goto EXCEPTION;
                 }
                 REGS->R[bTmp_0] = AS->stack[REGS->SP];
@@ -563,7 +571,11 @@ void VMCPU::run()
                     std::cout << "[DEBUG] POC" << std::endl;
                 #endif
                 if(&AS->stack[REGS->SP] == &AS->stack[sizeof(AS->stack)/sizeof(WORD)]){
-                    std::cout << "[ERROR] STACK UNDERFLOW!" << std::endl;
+                    #ifndef _VM_TEST_
+                        std::cout << "[ERROR] STACK UNDERFLOW!" << std::endl;
+                    #else
+                        vcpuFlag = VCpuFlag::UNDERFLOW;
+                    #endif
                     goto EXCEPTION;
                 }
                 bTmp_0 = *(BYTE*) &AS->stack[REGS->SP++];
@@ -580,7 +592,11 @@ void VMCPU::run()
                     std::cout << "[DEBUG] POCN" << std::endl;
                 #endif
                 if(&AS->stack[REGS->SP] == &AS->stack[sizeof(AS->stack)/sizeof(WORD)]){
-                    std::cout << "[ERROR] STACK UNDERFLOW!" << std::endl;
+                    #ifndef _VM_TEST_
+                        std::cout << "[ERROR] STACK UNDERFLOW!" << std::endl;
+                    #else
+                        vcpuFlag = VCpuFlag::UNDERFLOW;
+                    #endif
                     goto EXCEPTION;
                 }
                 bTmp_0 = *(BYTE*) &AS->stack[REGS->SP++];
@@ -596,7 +612,11 @@ void VMCPU::run()
                     std::cout << "[DEBUG] DEFAULT" << std::endl;
                 #endif
                 EXCEPTION:
-                    std::cout << "[ERROR] vCPU CRASH!" << std::endl;
+                    #ifndef _VM_TEST_
+                        std::cout << "[ERROR] vCPU CRASH!" << std::endl;
+                    #else
+                        vcpuFlag = VCpuFlag::ERROR;
+                    #endif
                     exit = true;
         }
     }

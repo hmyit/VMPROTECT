@@ -39,6 +39,10 @@ typedef struct {
 } REGISTERSS, *PREGISTERSS;
 
 
+#ifdef _VM_TEST_
+    enum class VCpuFlag {OK, ERROR, UNDERFLOW, OVERFLOW};
+#endif // _VM_TEST_
+
 class VMCPU {
     private:
         PADDRESS_SPACE AS;
@@ -54,6 +58,15 @@ class VMCPU {
         ~VMCPU();
         void run();
         bool loadCode(BYTE *, int, BYTE *, int);
+
+    #ifdef _VM_TEST_
+    public:
+        static const bool bIsOnTest = true;
+        VCpuFlag vcpuFlag;
+
+        PADDRESS_SPACE getAS() { return AS; }
+        PREGISTERSS getREGS() { return REGS; }
+    #endif
 };
 
 #endif //_VM_CPU_HPP
