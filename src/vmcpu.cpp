@@ -526,10 +526,11 @@ void VMCPU::run()
                 if(bTmp_0 > 5) goto EXCEPTION;
                 REGS->SP -= 1;
                 if(REGS->SP == 0xFFFF) {
+                    #ifdef _VM_TEST_
+                        vcpuFlag = VCpuFlag::OVERFLOW;
+                    #endif
                     #ifndef _VM_TEST_
                         std::cout << "[ERROR] STACK OVERFLOW!" << std::endl;
-                    #else
-                        vcpuFlag = VCpuFlag::OVERFLOW;
                     #endif
                     goto EXCEPTION;
                 }
@@ -546,10 +547,11 @@ void VMCPU::run()
                 bTmp_0 = AS->data[REGS->PC++];
                 if(bTmp_0 > 5) goto EXCEPTION;
                 if(&AS->stack[REGS->SP] == &AS->stack[sizeof(AS->stack)/sizeof(WORD)]){
+                    #ifdef _VM_TEST_
+                        vcpuFlag = VCpuFlag::UNDERFLOW;
+                    #endif
                     #ifndef _VM_TEST_
                         std::cout << "[ERROR] STACK UNDERFLOW!" << std::endl;
-                    #else
-                        vcpuFlag = VCpuFlag::UNDERFLOW;
                     #endif
                     goto EXCEPTION;
                 }
@@ -571,10 +573,11 @@ void VMCPU::run()
                     std::cout << "[DEBUG] POC" << std::endl;
                 #endif
                 if(&AS->stack[REGS->SP] == &AS->stack[sizeof(AS->stack)/sizeof(WORD)]){
+                    #ifdef _VM_TEST_
+                        vcpuFlag = VCpuFlag::UNDERFLOW;
+                    #endif
                     #ifndef _VM_TEST_
                         std::cout << "[ERROR] STACK UNDERFLOW!" << std::endl;
-                    #else
-                        vcpuFlag = VCpuFlag::UNDERFLOW;
                     #endif
                     goto EXCEPTION;
                 }
@@ -592,10 +595,11 @@ void VMCPU::run()
                     std::cout << "[DEBUG] POCN" << std::endl;
                 #endif
                 if(&AS->stack[REGS->SP] == &AS->stack[sizeof(AS->stack)/sizeof(WORD)]){
+                    #ifdef _VM_TEST_
+                        vcpuFlag = VCpuFlag::UNDERFLOW;
+                    #endif
                     #ifndef _VM_TEST_
                         std::cout << "[ERROR] STACK UNDERFLOW!" << std::endl;
-                    #else
-                        vcpuFlag = VCpuFlag::UNDERFLOW;
                     #endif
                     goto EXCEPTION;
                 }
@@ -612,10 +616,11 @@ void VMCPU::run()
                     std::cout << "[DEBUG] DEFAULT" << std::endl;
                 #endif
                 EXCEPTION:
+                    #ifdef _VM_TEST_
+                        if(vcpuFlag == VCpuFlag::OK) vcpuFlag = VCpuFlag::ERROR;
+                    #endif
                     #ifndef _VM_TEST_
                         std::cout << "[ERROR] vCPU CRASH!" << std::endl;
-                    #else
-                        vcpuFlag = VCpuFlag::ERROR;
                     #endif
                     exit = true;
         }

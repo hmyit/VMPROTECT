@@ -5,6 +5,8 @@
 #include <string.h>
 #include <stdint.h>
 
+//#include "./test.hpp"
+
 typedef uint8_t BYTE;
 typedef uint16_t WORD;
 typedef uint32_t DWORD;
@@ -40,7 +42,7 @@ typedef struct {
 
 
 #ifdef _VM_TEST_
-    enum class VCpuFlag {OK, ERROR, UNDERFLOW, OVERFLOW};
+    enum class VCpuFlag {OK = 0, ERROR, UNDERFLOW, OVERFLOW};
 #endif // _VM_TEST_
 
 class VMCPU {
@@ -66,7 +68,7 @@ class VMCPU {
 
         PADDRESS_SPACE getAS() { return AS; }
         PREGISTERSS getREGS() { return REGS; }
-    #endif
+    #endif // _VM_TEST_
 };
 
 #endif //_VM_CPU_HPP

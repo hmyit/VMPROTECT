@@ -1,8 +1,4 @@
-#include <iostream>
-
-#define _VM_TEST_
-
-#include "../include/vmcpu.hpp"
+#include "../include/test.hpp"
 
 class VMTest {
     private:
@@ -54,9 +50,9 @@ bool VMTest::testVM()
     T_REGS = vm->getREGS();
 
     /* ************************* */
-            /* TEST 1 
-            desc: check for unforeseen modifications
-            */
+        /* TEST 1 
+        desc: check for unforeseen modifications
+        */
     /* ************************* */
     ++currentTestNumber;
     T_AS->data[0] = 0x00; // NOP
@@ -90,9 +86,9 @@ bool VMTest::testVM()
     T_REGS->PC = (WORD) 0;
     printTestResult(bTestPass, currentTestNumber);
     /* ************************* */
-            /* TEST 2
-            desc: check the correctness of data transfer from a register to a register
-            */
+        /* TEST 2
+        desc: check the correctness of data transfer from a register to a register
+        */
     /* ************************* */
     ++currentTestNumber;
     T_REGS->R[1] = (WORD) 5;
@@ -124,9 +120,9 @@ bool VMTest::testVM()
     T_REGS->PC = (WORD) 0;
     printTestResult(bTestPass, currentTestNumber);
     /* ************************* */
-            /* TEST 3
-            desc: check the correctness of data transfer (BYTE and extend to WORD) from memory to a register
-            */
+        /* TEST 3
+        desc: check the correctness of data transfer (BYTE and extend to WORD) from memory to a register
+        */
     /* ************************* */
     ++currentTestNumber;
     T_REGS->R[2] = (WORD) 6;
@@ -156,10 +152,9 @@ bool VMTest::testVM()
     T_REGS->PC = (WORD) 0;
     printTestResult(bTestPass, currentTestNumber);
     /* ************************* */
-    /* ************************* */
-            /* TEST 4
-            desc: check the correctness of data transfer (WORD) from memory to a register
-            */
+        /* TEST 4
+        desc: check the correctness of data transfer (WORD) from memory to a register
+        */
     /* ************************* */
     ++currentTestNumber;
     T_REGS->R[2] = (WORD) 6;
@@ -188,6 +183,162 @@ bool VMTest::testVM()
     T_AS->data[4] = 0x00;
     T_AS->data[7] = 0x00;
     T_AS->data[8] = 0x00;
+    T_REGS->PC = (WORD) 0;
+    printTestResult(bTestPass, currentTestNumber);
+    /* ************************* */
+        /* TEST 5
+        desc: check the correctness of data transfer (BYTE) from a register to memory
+        */
+    /* ************************* */
+    ++currentTestNumber;
+    T_REGS->R[2] = (WORD) 6;
+    T_AS->data[0] = 0x07; // MOVBM
+    T_AS->data[1] = 0x02; // R2
+    T_AS->data[2] = 0x07;
+    T_AS->data[3] = 0x00; // 0007h
+    T_AS->data[4] = 0xEC; // EC
+    T_AS->data[7] = 0x03;
+    vm->vcpuFlag = VCpuFlag::OK;
+    vm->run();
+    if(vm->vcpuFlag == VCpuFlag::ERROR) {
+        bTestPass = false;
+        goto FINISH_TESTS;
+    }
+    if(T_REGS->R[2] == (WORD) 6) {
+        if(T_AS->data[7] == 0x06) {
+            if(T_AS->data[8] != 0x00) {
+                bTestPass = false;
+                goto FINISH_TESTS;
+            }
+        }
+        else {
+            bTestPass = false;
+            goto FINISH_TESTS;
+        }
+    }
+    else {
+        bTestPass = false;
+        goto FINISH_TESTS;
+    }
+    T_REGS->R[2] = (WORD) 0;
+    T_AS->data[0] = 0x00;
+    T_AS->data[1] = 0x00;
+    T_AS->data[2] = 0x00;
+    T_AS->data[3] = 0x00;
+    T_AS->data[4] = 0x00;
+    T_AS->data[7] = 0x00;
+    T_REGS->PC = (WORD) 0;
+    printTestResult(bTestPass, currentTestNumber);
+    /* ************************* */
+        /* TEST 6
+        desc: check the correctness of data transfer (WORD) from a register to memory
+        */
+    /* ************************* */
+    ++currentTestNumber;
+    T_REGS->R[2] = (WORD) 6;
+    T_AS->data[0] = 0x08; // MOVWM
+    T_AS->data[1] = 0x02; // R2
+    T_AS->data[2] = 0x07;
+    T_AS->data[3] = 0x00; // 0007h
+    T_AS->data[4] = 0xEC; // EC
+    T_AS->data[7] = 0x03;
+    T_AS->data[8] = 0x04;
+    vm->vcpuFlag = VCpuFlag::OK;
+    vm->run();
+    if(vm->vcpuFlag == VCpuFlag::ERROR) {
+        bTestPass = false;
+        goto FINISH_TESTS;
+    }
+    if(T_REGS->R[2] == (WORD) 6) {
+        if(T_AS->data[7] == 0x06) {
+            if(T_AS->data[8] != 0x00) {
+                bTestPass = false;
+                goto FINISH_TESTS;
+            }
+        }
+        else {
+            bTestPass = false;
+            goto FINISH_TESTS;
+        }
+    }
+    else {
+        bTestPass = false;
+        goto FINISH_TESTS;
+    }
+    T_REGS->R[2] = (WORD) 0;
+    T_AS->data[0] = 0x00;
+    T_AS->data[1] = 0x00;
+    T_AS->data[2] = 0x00;
+    T_AS->data[3] = 0x00;
+    T_AS->data[4] = 0x00;
+    T_AS->data[7] = 0x00;
+    T_AS->data[8] = 0x00;
+    T_REGS->PC = (WORD) 0;
+    printTestResult(bTestPass, currentTestNumber);
+    /* ************************* */
+        /* TEST 7
+        desc: check the stack underflow
+        */
+    /* ************************* */
+    ++currentTestNumber;
+    T_REGS->R[2] = (WORD) 6;
+    T_AS->data[0] = 0x62; // POP
+    T_AS->data[1] = 0x02; // R2
+    T_AS->data[2] = 0xEC; // EC
+    vm->vcpuFlag = VCpuFlag::OK;
+    vm->run();
+    if(vm->vcpuFlag == VCpuFlag::ERROR) {
+        bTestPass = false;
+        goto FINISH_TESTS;
+    }
+    else if(vm->vcpuFlag == VCpuFlag::UNDERFLOW){
+        if(T_REGS->R[2] != (WORD) 6) {
+            bTestPass = false;
+            goto FINISH_TESTS;
+        }
+    }
+    else{
+        bTestPass = false;
+        goto FINISH_TESTS;
+    }
+    T_REGS->R[2] = (WORD) 0;
+    T_AS->data[0] = 0x00;
+    T_AS->data[1] = 0x00;
+    T_AS->data[2] = 0x00;
+    T_REGS->PC = (WORD) 0;
+    printTestResult(bTestPass, currentTestNumber);
+    /* ************************* */
+        /* TEST 8
+        desc: check the stack overflow
+        */
+    /* ************************* */
+    ++currentTestNumber;
+    T_REGS->R[2] = (WORD) 6;
+    T_REGS->SP = 0;
+    T_AS->data[0] = 0x61; // POP
+    T_AS->data[1] = 0x02; // R2
+    T_AS->data[2] = 0xEC; // EC
+    vm->vcpuFlag = VCpuFlag::OK;
+    vm->run();
+    if(vm->vcpuFlag == VCpuFlag::ERROR) {
+        bTestPass = false;
+        goto FINISH_TESTS;
+    }
+    else if(vm->vcpuFlag == VCpuFlag::OVERFLOW){
+        if(T_REGS->R[2] != (WORD) 6) {
+            bTestPass = false;
+            goto FINISH_TESTS;
+        }
+    }
+    else{
+        bTestPass = false;
+        goto FINISH_TESTS;
+    }
+    T_REGS->R[2] = (WORD) 0;
+    T_AS->data[0] = 0x00;
+    T_AS->data[1] = 0x00;
+    T_AS->data[2] = 0x00;
+    T_REGS->SP = sizeof(T_AS->stack) / sizeof(WORD);
     T_REGS->PC = (WORD) 0;
     printTestResult(bTestPass, currentTestNumber);
     /* ************************* */
