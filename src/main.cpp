@@ -4,7 +4,7 @@
 int main()
 {
     std::cout << "***************" << std::endl;
-    std::cout << "VMPROTECT v0.01" << std::endl;
+    std::cout << "VMPROTECT v0.02" << std::endl;
     std::cout << "***************" << std::endl;
 
     VMCPU *vm = new VMCPU();
@@ -16,11 +16,17 @@ int main()
     } while(password.size() < 2 || password.size() > 26);
 
     BYTE *usrInput = new BYTE(password.size() + 1);
-    memset(usrInput, 0, sizeof(usrInput)/sizeof(usrInput[0]));
-    for(unsigned int i =0; i < password.size(); i++) {
-        usrInput[i] = (BYTE) password[i];
+    try {
+        memset(usrInput, 0, sizeof(usrInput)/sizeof(usrInput[0]));
+        for(unsigned int i =0; i < password.size(); i++) {
+            usrInput[i] = (BYTE) password[i];
+        }
+        usrInput[password.size()] = (BYTE) 0;
+    } catch (...) {
+        delete[] usrInput;
+        delete vm;
+        return -1;
     }
-    usrInput[password.size()] = (BYTE) 0;
 
     BYTE *mc = NULL;
     int mcsize = loadProtectedCode(&mc);
@@ -28,12 +34,20 @@ int main()
     {
         delete[] usrInput;
         delete[] mc;
+        delete vm;
         return -1;
     }
+
     delete[] usrInput;
     delete[] mc;
-    vm->run();
-    delete vm;
+    
+    try{
+        vm->run();
+    } catch(...){
+        delete vm;
+        return -1;
+    }
 
+    delete vm;
     return 0;
 }
