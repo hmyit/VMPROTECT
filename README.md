@@ -4,7 +4,7 @@ A code obfuscation method using virtual machines to protect a product.
 A virtual machine simulates a CPU along with a few other hardware components, allowing it to perform arithmetic, read and write to memory and interact with I/O devices. It can understand a machine language which you can use to program it. Virtual machines used in code obfuscation are completely different than common virtual machnines. They are very specific to the task of executing a few set of instructions. Each instruction is given a custom opcode (often generated at random).
 
 ## Documentation
-The VM will simulate a fictional cpu. It has a custom instrucion set compared to x86-64.
+The VM will simulate a fictional cpu (16-bit). It has a custom instrucion set compared to x86-64.
 
 ### Memory
 The VM has 4,096 memory locations, each of which stores a 8-bit value (it can store a total of 4kb). The VM has stack, which is a separate data structure. The stack has 256 memory locations, each of which stores a 16-bit value (it can store a total of 512b).
@@ -80,6 +80,8 @@ EC  | EC | End of code and end of the VM's cpu |
 26  |  SUBRRL r<sub>dst</sub>, r<sub>src</sub> | Substract two registers (the low byte) |
 27  |  xOR r<sub>dst</sub>, r<sub>src</sub> | Xor two registers |
 28  |  xOR r<sub>dst</sub>, r<sub>src</sub> | Xor two registers (the low byte) |
+29  |  NOT r<sub>dst</sub>| Bitwise NOT on value in a register |
+2A  |  NOT r<sub>dst</sub> | Bitwise NOT on value in a register (the low byte) |
 31  |  CMP r<sub>dst</sub>, r<sub>src</sub> | Compare two registers |
 32  |  CMPL r<sub>dst</sub>, r<sub>src</sub> | Compare two registers (the low byte) |
 61  |  PUSH r<sub>src</sub> | Push value from a register to stack |

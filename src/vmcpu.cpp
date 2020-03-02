@@ -468,6 +468,26 @@ void VMCPU::run()
                 *(BYTE *) &REGS->R[bTmp_0] = bTmp_2;
                 REGS->CF = 0;
                 break;
+            /*
+                NOT - Bitwise not on value in a register
+                    and save result in this register
+                29 02 => NOT R2
+            */
+            case 0x29:
+                bTmp_0 = AS->data[REGS->PC++];
+                if(bTmp_0 > 5) goto EXCEPTION;
+                REGS->R[bTmp_0] = ~ REGS->R[bTmp_0];
+                break;
+            /*
+                NOTB - Bitwise not on value in a register (lower bytes)
+                    and save result in this register
+                29 02 => NOT R2
+            */
+            case 0x2A:
+                bTmp_0 = AS->data[REGS->PC++];
+                if(bTmp_0 > 5) goto EXCEPTION;
+                *(BYTE *) &REGS->R[bTmp_0] = ~ (*(BYTE *) &REGS->R[bTmp_0]);
+                break;
             /*  ********************************
                             COMPARE
                 ********************************
